@@ -2,11 +2,11 @@ pipeline {
     agent any
 
     stages {
-        stage('Linux Test') {
+        stage('Check Environment') {
             steps {
                 sh 'hostname'
                 sh 'pwd'
-                sh 'echo "Hello from GitHub Jenkinsfile"'
+                sh 'docker --version'
             }
         }
     }
