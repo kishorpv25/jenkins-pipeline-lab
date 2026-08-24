@@ -17,11 +17,12 @@ pipeline {
             }
         }
 
-        stage('Run Container') {
+        stage('Deploy Container') {
             steps {
+                sh 'docker stop jenkins-ci-demo-container || true'
+                sh 'docker rm jenkins-ci-demo-container || true'
                 sh 'docker run -d --name jenkins-ci-demo-container -p 8081:80 jenkins-ci-demo'
             }
         }
-
     }
 }
