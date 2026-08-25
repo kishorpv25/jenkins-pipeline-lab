@@ -17,6 +17,18 @@ pipeline {
             }
         }
 
+        stage('Test') {
+            steps {
+                sh '''
+                    docker run -d --name jenkins-ci-test -p 8082:80 jenkins-ci-demo
+                    sleep 3
+                    curl -f http://localhost:8082
+                    docker stop jenkins-ci-test
+                    docker rm jenkins-ci-test
+                '''
+            }
+        }
+
         stage('Deploy Container') {
             steps {
                 sh 'docker stop jenkins-ci-demo-container || true'
