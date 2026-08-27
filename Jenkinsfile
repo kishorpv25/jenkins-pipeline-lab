@@ -49,19 +49,16 @@ pipeline {
             }
         }
 
-        stage('Deploy Container') {
+        stage('SSH Test') {
             steps {
-                sh '''
-                    docker stop jenkins-ci-demo-container || true
-                    docker rm jenkins-ci-demo-container || true
-
-                    docker run -d \
-                    --name jenkins-ci-demo-container \
-                    -p 8081:80 \
-                    jenkins-ci-demo:latest
-                '''
+                sshagent(['jenkins-production-ssh']) {
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no \
+                        ubuntu@15.252.144.112 \
+                        "hostname && whoami"
+                    '''
+                }
             }
         }
-
     }
 }
