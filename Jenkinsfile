@@ -49,13 +49,28 @@ pipeline {
             }
         }
 
-        stage('SSH Test') {
+        stage('Deploy to Production') {
             steps {
                 sshagent(['jenkins-production-ssh']) {
                     sh '''
                         ssh -o StrictHostKeyChecking=no \
                         ubuntu@15.252.144.112 \
-                        "hostname && whoami"
+                        "
+                            aws ecr get-login-password --region ap-south-1 | \
+                            docker login --username AWS --password-stdin \
+                            945488515668.dkr.ecr.ap-south-1.amazonaws.com
+
+                            docker pull \
+                            945488515668.dkr.ecr.ap-south-1.amazonaws.com/jenkins-ci-demo:latest
+
+                            docker stop jenkins-ci-demo || true
+                            docker rm jenkins-ci-demo || true
+
+                            docker run -d \
+                            --name jenkins-ci-demo \
+                            -p 80:80 \
+                            945488515668.dkr.ecr.ap-south-1.amazonaws.com/jenkins-ci-demo:latest
+                        "
                     '''
                 }
             }
