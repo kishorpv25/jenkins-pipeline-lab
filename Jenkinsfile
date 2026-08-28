@@ -1,6 +1,12 @@
 pipeline {
     agent any
 
+    environment {
+        IMAGE_TAG = "${GIT_COMMIT[0..7]}"
+        ECR_REGISTRY = "945488515668.dkr.ecr.ap-south-1.amazonaws.com"
+        IMAGE_NAME = "jenkins-ci-demo"
+    }
+
     stages {
 
         stage('Check Environment') {
@@ -9,19 +15,26 @@ pipeline {
                 sh 'pwd'
                 sh 'docker --version'
                 sh 'aws --version'
+                sh 'echo IMAGE_TAG=$IMAGE_TAG'
             }
         }
 
         stage('Docker Build') {
             steps {
-                sh 'docker build -t jenkins-ci-demo:latest .'
+                sh '''
+                    docker build \
+                    -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                '''
             }
         }
 
         stage('Test') {
             steps {
                 sh '''
-                    docker run -d --name jenkins-ci-test -p 8082:80 jenkins-ci-demo:latest
+                    docker run -d \
+                    --name jenkins-ci-test \
+                    -p 8082:80 \
+                    ${IMAGE_NAME}:${IMAGE_TAG}
 
                     sleep 3
 
@@ -38,13 +51,14 @@ pipeline {
                 sh '''
                     aws ecr get-login-password --region ap-south-1 | \
                     docker login --username AWS --password-stdin \
-                    945488515668.dkr.ecr.ap-south-1.amazonaws.com
+                    ${ECR_REGISTRY}
 
-                    docker tag jenkins-ci-demo:latest \
-                    945488515668.dkr.ecr.ap-south-1.amazonaws.com/jenkins-ci-demo:latest
+                    docker tag \
+                    ${IMAGE_NAME}:${IMAGE_TAG} \
+                    ${ECR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}
 
                     docker push \
-                    945488515668.dkr.ecr.ap-south-1.amazonaws.com/jenkins-ci-demo:latest
+                    ${ECR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}
                 '''
             }
         }
@@ -58,10 +72,10 @@ pipeline {
                         "
                             aws ecr get-login-password --region ap-south-1 | \
                             docker login --username AWS --password-stdin \
-                            945488515668.dkr.ecr.ap-south-1.amazonaws.com
+                            ${ECR_REGISTRY}
 
                             docker pull \
-                            945488515668.dkr.ecr.ap-south-1.amazonaws.com/jenkins-ci-demo:latest
+                            ${ECR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}
 
                             docker stop jenkins-ci-demo || true
                             docker rm jenkins-ci-demo || true
@@ -69,7 +83,7 @@ pipeline {
                             docker run -d \
                             --name jenkins-ci-demo \
                             -p 80:80 \
-                            945488515668.dkr.ecr.ap-south-1.amazonaws.com/jenkins-ci-demo:latest
+                            ${ECR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}
                         "
                     '''
                 }
