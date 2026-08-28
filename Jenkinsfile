@@ -68,7 +68,7 @@ pipeline {
                 sshagent(['jenkins-production-ssh']) {
                     sh '''
                         ssh -o StrictHostKeyChecking=no \
-                        ubuntu@13.201.166.172 \
+                        ubuntu@15.252.144.112 \
                         "
                             aws ecr get-login-password --region ap-south-1 | \
                             docker login --username AWS --password-stdin \
@@ -84,6 +84,14 @@ pipeline {
                             --name jenkins-ci-demo \
                             -p 80:80 \
                             ${ECR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}
+
+                            sleep 3
+
+                            echo 'Checking container status...'
+                            docker ps --filter 'name=jenkins-ci-demo'
+
+                            echo 'Checking application...'
+                            curl -f http://localhost
                         "
                     '''
                 }
