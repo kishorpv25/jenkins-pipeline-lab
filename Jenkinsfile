@@ -54,7 +54,7 @@ pipeline {
                 sshagent(['jenkins-production-ssh']) {
                     sh '''
                         ssh -o StrictHostKeyChecking=no \
-                        ubuntu@15.252.144.112 \
+                        ubuntu@13.201.166.172 \
                         "
                             aws ecr get-login-password --region ap-south-1 | \
                             docker login --username AWS --password-stdin \
