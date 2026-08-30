@@ -174,7 +174,7 @@ pipeline {
                     sh '''
                         echo "Deploying ${IMAGE_NAME}:${IMAGE_TAG} to Production..."
 
-                        ssh -o StrictHostKeyChecking=no ubuntu@13.201.166.172 << EOF
+                        ssh -o StrictHostKeyChecking=no ubuntu@13.126.138.195 << EOF
 
                         echo "Logging into ECR..."
 
