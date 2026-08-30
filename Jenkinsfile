@@ -116,7 +116,7 @@ pipeline {
 
                     sh '''
                         ssh -o StrictHostKeyChecking=no \
-                        ubuntu@13.201.166.172 \
+                        ubuntu@13.201.80.80 \
                         "
                             aws ecr get-login-password --region ap-south-1 | \
                             docker login --username AWS --password-stdin \
