@@ -211,7 +211,7 @@ pipeline {
 
                         curl -f http://localhost
 
-                        EOF
+                    
                     '''
 
                     echo "Successfully deployed ${IMAGE_NAME}:${IMAGE_TAG} to Production."
