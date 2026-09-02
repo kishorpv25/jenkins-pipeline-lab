@@ -1,0 +1,41 @@
+---
+- name: Deploy application to production
+  hosts: production
+  become: false
+
+  tasks:
+
+    - name: Login to Amazon ECR
+      shell: |
+        aws ecr get-login-password --region ap-south-1 | \
+        docker login --username AWS --password-stdin \
+        945488515668.dkr.ecr.ap-south-1.amazonaws.com
+
+    - name: Pull application image
+      command: >
+        docker pull
+        945488515668.dkr.ecr.ap-south-1.amazonaws.com/jenkins-ci-demo:{{ image_tag }}
+
+    - name: Stop existing application container
+      command: docker stop jenkins-ci-demo
+      failed_when: false
+
+    - name: Remove existing application container
+      command: docker rm jenkins-ci-demo
+      failed_when: false
+
+    - name: Start new application container
+      command: >
+        docker run -d
+        --name jenkins-ci-demo
+        -p 80:80
+        945488515668.dkr.ecr.ap-south-1.amazonaws.com/jenkins-ci-demo:{{ image_tag }}
+
+    - name: Wait for application to start
+      pause:
+        seconds: 3
+
+    - name: Verify application health
+      uri:
+        url: http://localhost
+        status_code: 200
