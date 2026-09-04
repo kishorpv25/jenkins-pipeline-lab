@@ -1,0 +1,2 @@
+[staging]
+staging-server ansible_host=172.31.3.41 ansible_user=ubuntu

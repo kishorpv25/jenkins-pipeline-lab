@@ -1,2 +1,2 @@
 [production]
-production-server ansible_host=3.109.55.69 ansible_user=ubuntu
+production-server ansible_host=13.200.215.198 ansible_user=ubuntu
