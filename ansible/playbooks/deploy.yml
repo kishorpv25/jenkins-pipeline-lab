@@ -1,6 +1,6 @@
 ---
 - name: Deploy application to production
-  hosts: production
+  hosts: all
   become: false
 
   tasks:
